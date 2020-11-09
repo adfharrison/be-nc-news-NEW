@@ -5,3 +5,4 @@
 \d articles;
 \d comments;
 select * from topics;
+select * from users;
