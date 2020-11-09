@@ -1,10 +1,24 @@
+const data = require("../data");
 const {
-  topicData,
-  articleData,
-  commentData,
-  userData,
-} = require('../data/index.js');
+  createArticlesRef,
+  formatCommentsData,
+  formatArticlesData,
+} = require("../../db/utils/data-manipulation");
 
-exports.seed = function (knex) {
+exports.seed = function (connection) {
   // add seeding functionality here
+  return connection.migrate
+    .rollback()
+    .then(() => {
+      return connection.migrate.latest();
+    })
+    .then(() => {
+      return connection
+        .insert(data.topicsData)
+        .into("topics")
+        .returning("*")
+        .then((topicsRows) => {
+          console.log(`inserted ${topicsRows.length} topics`);
+        });
+    });
 };

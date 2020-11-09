@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "setup-dbs": "psql -f ./db/setup.sql",
-    "dev": "nodemon listen.js",
-    "seed": "knex seed:run",
+    "dev": "npm nodemon listen.js",
+    "seed": "psql -f db/setup.sql && NODE_ENV=test knex seed:run",
     "test": "jest data-manipulation.test.js",
     "start": "node listen.js",
     "migrate-make": "knex migrate:make",
