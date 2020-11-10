@@ -16,11 +16,11 @@ exports.seed = function (connection) {
       return connection.insert(data.topicsData).into('topics').returning('*');
     })
     .then((topicsRows) => {
-      console.log(`inserted ${topicsRows.length} topics`);
+      //console.log(`inserted ${topicsRows.length} topics`);
       return connection.insert(data.usersData).into('users').returning('*');
     })
     .then((usersRows) => {
-      console.log(`inserted ${usersRows.length} users`);
+      //console.log(`inserted ${usersRows.length} users`);
 
       const formattedArticles = formatArticlesData(data.articlesData);
 
@@ -30,7 +30,7 @@ exports.seed = function (connection) {
         .returning('*');
     })
     .then((articlesRows) => {
-      console.log(`inserted ${articlesRows.length} articles`);
+      //console.log(`inserted ${articlesRows.length} articles`);
 
       const articlesRef = createArticlesRef(articlesRows);
       const formattedComments = formatCommentsData(
@@ -44,6 +44,6 @@ exports.seed = function (connection) {
         .returning('*');
     })
     .then((commentsRows) => {
-      console.log(`inserted ${commentsRows.length} comments`);
+      // console.log(`inserted ${commentsRows.length} comments`);
     });
 };
