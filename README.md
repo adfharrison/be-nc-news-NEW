@@ -167,7 +167,6 @@ GET /api/topics
 
 **Please now bid farewell to your pair and continue on this sprint working solo. Ensure that you fork your partner's repo so you don't run into merge conflicts.**
 
-
 ```http
 GET /api/users/:username
 ```
@@ -337,7 +336,6 @@ GET /api
 Make sure your application and your database is hosted using Heroku
 
 See the hosting.md file in this repo for more guidance
-
 
 #### Pagination
 

@@ -103,8 +103,32 @@ describe('/api', () => {
           .get('/api/users/iamnothere')
           .expect(404)
           .then(({ body }) => {
-            expect(body.msg).toBe('Route Not Found');
+            expect(body.msg).toBe('User Not Found');
           });
+      });
+    });
+  });
+  describe('api/articles', () => {
+    test('GET status 200 and array of articles', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toMatchObject({ articles: expect.any(Array) });
+        });
+    });
+    describe('api/articles - errors ', () => {
+      test('405 invalid methods articles method', () => {
+        const invalidMethods = ['patch', 'put', 'delete'];
+        const requestPromises = invalidMethods.map((method) => {
+          return request(app)
+            [method]('/api/articles')
+            .expect(405)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Method Not Allowed');
+            });
+        });
+        return Promise.all(requestPromises);
       });
     });
   });
