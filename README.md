@@ -103,16 +103,16 @@ GET /api/topics
 
 >>> Time to go solo! <<<
 
-GET /api/users/:username
+GET /api/users/:username done
 
-DELETE /api/articles/:article_id
-PATCH /api/articles/:article_id
-GET /api/articles/:article_id
+DELETE /api/articles/:article_id DOING
+PATCH /api/articles/:article_id done
+GET /api/articles/:article_id done
 
 POST /api/articles/:article_id/comments
-GET /api/articles/:article_id/comments
+GET /api/articles/:article_id/comments done
 
-GET /api/articles
+GET /api/articles NEXT NEED TO PUT QUERIES ON IT
 POST /api/articles
 
 PATCH /api/comments/:comment_id
@@ -120,7 +120,7 @@ DELETE /api/comments/:comment_id
 
 GET /api
 
-DELETE /api/articles/:article_id
+
 POST /api/topics
 POST /api/users
 GET /api/users

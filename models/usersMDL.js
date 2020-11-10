@@ -19,7 +19,7 @@ const fetchUserByUsername = (req) => {
       if (userRows.length === 0) {
         return Promise.reject({ status: 404, msg: 'User Not Found' });
       } else {
-        return { requestedUser: userRows[0] };
+        return { user: userRows[0] };
       }
     });
 };
