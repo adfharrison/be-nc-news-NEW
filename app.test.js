@@ -3,6 +3,7 @@ process.env.NODE_ENV = 'test';
 const app = require('./app');
 const request = require('supertest');
 const connection = require('./db/data/connections');
+const { convertTimeStamp } = require('./db/utils/data-manipulation');
 
 describe('/api', () => {
   afterAll(() => {
@@ -11,6 +12,10 @@ describe('/api', () => {
   beforeEach(() => {
     return connection.seed.run();
   });
+  // HERE IS THE PLACE THAT THE THING THAT WILL BREAK EVERYTHING IS
+  //beforeEach(() => {
+  // Date.now = jest.fn(() => 1605052800000); // 2020-11-11T00:00Z0 (GMT)
+  //});
   describe('/api - errors', () => {
     test('404 missing api/ endpoint', () => {
       return request(app)
@@ -295,7 +300,7 @@ describe('/api', () => {
           });
       });
 
-      test('DELETE status 204', () => {
+      test('DELETE status 204 - deletes article', () => {
         return request(app)
           .delete('/api/articles/1')
           .expect(204)
@@ -314,7 +319,7 @@ describe('/api', () => {
           .get('/api/articles/5/comments')
           .expect(200)
           .then((response) => {
-            expect(response.body).toEqual([
+            expect(response.body.comments).toEqual([
               {
                 comment_id: 14,
                 votes: 16,
@@ -338,7 +343,7 @@ describe('/api', () => {
           .get('/api/articles/5/comments')
           .expect(200)
           .then((response) => {
-            expect(response.body).toBeSortedBy('created_at', {
+            expect(response.body.comments).toBeSortedBy('created_at', {
               descending: true,
             });
           });
@@ -348,7 +353,7 @@ describe('/api', () => {
           .get('/api/articles/5/comments?sort_by=votes')
           .expect(200)
           .then((response) => {
-            expect(response.body).toBeSortedBy('votes', {
+            expect(response.body.comments).toBeSortedBy('votes', {
               descending: true,
             });
           });
@@ -358,7 +363,7 @@ describe('/api', () => {
           .get('/api/articles/5/comments?sort_by=author&order=asc')
           .expect(200)
           .then((response) => {
-            expect(response.body).toBeSortedBy('author', {
+            expect(response.body.comments).toBeSortedBy('author', {
               descending: false,
             });
           });
@@ -368,9 +373,28 @@ describe('/api', () => {
           .get('/api/articles/1/comments?sort_by=created_at&order=asc')
           .expect(200)
           .then((response) => {
-            expect(response.body).toBeSortedBy('created_at', {
+            expect(response.body.comments).toBeSortedBy('created_at', {
               descending: false,
             });
+          });
+      });
+      test('POST status 201 - posts comment and returns posted comment', () => {
+        return request(app)
+          .post('/api/articles/1/comments')
+          .send({
+            username: 'butter_bridge',
+            body: 'i am a new comment body',
+          })
+          .expect(201)
+          .then((response) => {
+            //const timeNow = convertTimeStamp(Date.now());
+
+            expect(response.body).toHaveProperty('article_id');
+            expect(response.body).toHaveProperty('body');
+            expect(response.body).toHaveProperty('votes');
+            expect(response.body).toHaveProperty('comment_id');
+            expect(response.body).toHaveProperty('created_at');
+            expect(response.body).toHaveProperty('author');
           });
       });
     });
@@ -467,6 +491,23 @@ describe('/api', () => {
             expect(body.msg).toBe('Bad Request');
           });
       });
+
+      test('POST 400 bad request /articles/article_id/comments - incorrect post format ', () => {
+        return request(app)
+          .post('/api/articles/1/comments')
+          .send({
+            notAKey: 'this is a new article',
+            notAKeyEither: 'the article that is new, is new',
+            votes: 12,
+            topic: 'mitch',
+            author: 'butter_bridge',
+            created_at: '2018-11-15T12:21:54.171Z',
+          })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad Request');
+          });
+      });
       test(' Query 400 Error - /articles/:article_id/comments - SortBy', () => {
         return request(app)
           .get('/api/articles/1/comments?sort_by=notAcolumn')
@@ -482,6 +523,182 @@ describe('/api', () => {
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).toBe('Bad Request');
+          });
+      });
+    });
+  });
+  describe('api/comments', () => {
+    test('GET status 200 and array of comments', () => {
+      return request(app)
+        .get('/api/comments')
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toMatchObject({ comments: expect.any(Array) });
+        });
+    });
+    describe('api/comments/comment_id', () => {
+      test('GET status 200 and single comment', () => {
+        return request(app)
+          .get('/api/comments/1')
+          .expect(200)
+          .then((response) => {
+            //const timeNow = convertTimeStamp(Date.now());
+
+            expect(response.body.comment).toHaveProperty('article_id');
+            expect(response.body.comment).toHaveProperty('body');
+            expect(response.body.comment).toHaveProperty('votes');
+            expect(response.body.comment).toHaveProperty('comment_id');
+            expect(response.body.comment).toHaveProperty('created_at');
+            expect(response.body.comment).toHaveProperty('author');
+          });
+      });
+      test('PATCH status 201 increment vote return updated comment', () => {
+        return request(app)
+          .patch('/api/comments/1')
+          .send({ inc_votes: 1 })
+          .expect(201)
+          .then((response) => {
+            expect(response.body.comment).toEqual({
+              comment_id: 1,
+              body:
+                "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+              votes: 17,
+              author: 'butter_bridge',
+              article_id: 9,
+              created_at: '2017-11-22T12:36:03.389Z',
+            });
+          });
+      });
+      test('PATCH status 201 decrement vote return updated comment', () => {
+        return request(app)
+          .patch('/api/comments/1')
+          .send({ inc_votes: -1 })
+          .expect(201)
+          .then((response) => {
+            expect(response.body.comment).toEqual({
+              comment_id: 1,
+              body:
+                "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+              votes: 15,
+              author: 'butter_bridge',
+              article_id: 9,
+              created_at: '2017-11-22T12:36:03.389Z',
+            });
+          });
+      });
+      test('PATCH status 201 zero vote doesnt change vote count', () => {
+        return request(app)
+          .patch('/api/comments/1')
+          .send({ inc_votes: 0 })
+          .expect(201)
+          .then((response) => {
+            expect(response.body.comment).toEqual({
+              comment_id: 1,
+              body:
+                "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+              votes: 16,
+              author: 'butter_bridge',
+              article_id: 9,
+              created_at: '2017-11-22T12:36:03.389Z',
+            });
+          });
+      });
+      test('PATCH status 201 undefined vote doesnt change vote count', () => {
+        return request(app)
+          .patch('/api/comments/1')
+          .send({ inc_votes: undefined })
+          .expect(201)
+          .then((response) => {
+            expect(response.body.comment).toEqual({
+              comment_id: 1,
+              body:
+                "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+              votes: 16,
+              author: 'butter_bridge',
+              article_id: 9,
+              created_at: '2017-11-22T12:36:03.389Z',
+            });
+          });
+      });
+      test('DELETE status 204 - deletes comment', () => {
+        return request(app)
+          .delete('/api/comments/1')
+          .expect(204)
+          .then(() => {
+            return request(app)
+              .get('/api/comments')
+              .then((res) => {
+                expect(res.body.comments.length).toBe(17);
+              });
+          });
+      });
+    });
+    describe('api/comments - errors', () => {
+      test('405 invalid methods /comments method', () => {
+        const invalidMethods = ['put', 'patch', 'delete', 'post'];
+        const requestPromises = invalidMethods.map((method) => {
+          return request(app)
+            [method]('/api/comments')
+            .expect(405)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Method Not Allowed');
+            });
+        });
+        return Promise.all(requestPromises);
+      });
+      test('405 invalid methods /comments/:comment_id method', () => {
+        const invalidMethods = ['put', 'post'];
+        const requestPromises = invalidMethods.map((method) => {
+          return request(app)
+            [method]('/api/comments/1')
+            .expect(405)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Method Not Allowed');
+            });
+        });
+        return Promise.all(requestPromises);
+      });
+      test('GET 404 invalid comment_id /comments/:comment_id ', () => {
+        return request(app)
+          .get('/api/comments/99999')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Comment Not Found');
+          });
+      });
+      test('GET 400 bad request /comments/:comment_id ', () => {
+        return request(app)
+          .get('/api/comments/chips')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad Request');
+          });
+      });
+      test('PATCH 404 invalid comment_id /comments/:comment_id ', () => {
+        return request(app)
+          .patch('/api/comments/99999')
+          .send({ inc_votes: 1 })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Comment Not Found');
+          });
+      });
+      test('PATCH 400 bad request/comments/:comment_id ', () => {
+        return request(app)
+          .patch('/api/comments/chips')
+          .send({ inc_votes: undefined })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad Request');
+          });
+      });
+
+      test('DELETE 404 invalid comment_id /comments/:comment_id ', () => {
+        return request(app)
+          .delete('/api/comments/99999')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Comment Not Found');
           });
       });
     });

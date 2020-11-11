@@ -8,7 +8,10 @@ const {
   postArticle,
 } = require('../contollers/articlesCTRL.js');
 
-const { getCommentsByArticleId } = require('../contollers/commentsCTRL');
+const {
+  getCommentsByArticleId,
+  postCommentByArticleId,
+} = require('../contollers/commentsCTRL');
 const { send405 } = require('../errors');
 
 articlesRouter.route('/').get(getAllArticles).post(postArticle).all(send405);
@@ -19,5 +22,9 @@ articlesRouter
   .delete(deleteArticleById)
   .all(send405);
 
-articlesRouter.route('/:article_id/comments').get(getCommentsByArticleId);
+articlesRouter
+  .route('/:article_id/comments')
+  .get(getCommentsByArticleId)
+  .post(postCommentByArticleId)
+  .all(send405);
 module.exports = articlesRouter;

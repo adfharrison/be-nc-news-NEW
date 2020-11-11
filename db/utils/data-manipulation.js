@@ -33,7 +33,7 @@ const formatCommentsData = (commentsData, articlesRef) => {
 const formatArticlesData = (articlesData) => {
   const formattedArticles = articlesData.map((article) => {
     article.created_at = convertTimeStamp(article.created_at);
-    if (!article.hasOwnProperty("votes")) {
+    if (!article.hasOwnProperty('votes')) {
       article.votes = 0;
     }
     return article;
@@ -42,4 +42,9 @@ const formatArticlesData = (articlesData) => {
   return formattedArticles;
 };
 
-module.exports = { createArticlesRef, formatCommentsData, formatArticlesData };
+module.exports = {
+  createArticlesRef,
+  formatCommentsData,
+  formatArticlesData,
+  convertTimeStamp,
+};

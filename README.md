@@ -107,16 +107,16 @@ GET /api/users/:username done
 
 DELETE /api/articles/:article_id done
 PATCH /api/articles/:article_id done
-GET /api/articles/:article_id done
+GET /api/articles/:article_id done <<NEED TO REFACTOR WITH.JOIN>>
 
-POST /api/articles/:article_id/comments after next
+POST /api/articles/:article_id/comments done
 GET /api/articles/:article_id/comments + queries done
 
 GET /api/articles + queries done
-POST /api/articles next
+POST /api/articles done
 
-PATCH /api/comments/:comment_id
-DELETE /api/comments/:comment_id
+PATCH /api/comments/:comment_id done
+DELETE /api/comments/:comment_id done
 
 GET /api
 

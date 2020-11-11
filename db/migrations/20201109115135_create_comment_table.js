@@ -8,7 +8,7 @@ exports.up = function (knex) {
       .references('articles.article_id')
       .onDelete('SET NULL');
     commentsTable.integer('votes').defaultTo(0);
-    commentsTable.timestamp('created_at');
+    commentsTable.timestamp('created_at').defaultTo(knex.fn.now());
     commentsTable.text('body');
   });
 };

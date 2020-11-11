@@ -50,7 +50,7 @@ const patchArticle = (req, res, next) => {
 const deleteArticleById = (req, res, next) => {
   removeArticle(req)
     .then(() => {
-      res.status(204).send();
+      res.sendStatus(204);
     })
     .catch((error) => {
       next(error);

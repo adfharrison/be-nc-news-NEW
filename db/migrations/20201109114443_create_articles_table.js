@@ -5,9 +5,9 @@ exports.up = function (knex) {
     articlesTable.text('title');
     articlesTable.text('body');
     articlesTable.integer('votes').defaultTo(0);
-    articlesTable.text('topic').references('topics.slug');
-    articlesTable.text('author').references('users.username');
-    articlesTable.timestamp('created_at');
+    articlesTable.text('topic').references('topics.slug'); //.onDelete('SET NULL');
+    articlesTable.text('author').references('users.username'); //.onDelete('SET NULL');
+    articlesTable.timestamp('created_at').defaultTo(knex.fn.now());
   });
 };
 
