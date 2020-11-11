@@ -105,15 +105,15 @@ GET /api/topics
 
 GET /api/users/:username done
 
-DELETE /api/articles/:article_id DOING
+DELETE /api/articles/:article_id done
 PATCH /api/articles/:article_id done
 GET /api/articles/:article_id done
 
-POST /api/articles/:article_id/comments
-GET /api/articles/:article_id/comments done
+POST /api/articles/:article_id/comments after next
+GET /api/articles/:article_id/comments + queries done
 
-GET /api/articles NEXT NEED TO PUT QUERIES ON IT
-POST /api/articles
+GET /api/articles + queries done
+POST /api/articles next
 
 PATCH /api/comments/:comment_id
 DELETE /api/comments/:comment_id

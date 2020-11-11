@@ -3,12 +3,25 @@ const {
   fetchArticleById,
   editArticle,
   removeArticle,
+  sendArticle,
 } = require('../models/articlesMDL');
 
 const getAllArticles = (req, res, next) => {
-  fetchAllArticles(req)
+  const sort_by = req.query.sort_by;
+  const order = req.query.order;
+  fetchAllArticles(req, sort_by, order)
     .then((articles) => {
       res.status(200).send(articles);
+    })
+    .catch((error) => {
+      next(error);
+    });
+};
+
+const postArticle = (req, res, next) => {
+  sendArticle(req)
+    .then((article) => {
+      res.status(201).send(article);
     })
     .catch((error) => {
       next(error);
@@ -34,10 +47,10 @@ const patchArticle = (req, res, next) => {
       next(error);
     });
 };
-const deleteArticleById = (req, res, nex) => {
+const deleteArticleById = (req, res, next) => {
   removeArticle(req)
-    .then((msg) => {
-      res.status(204).send(msg);
+    .then(() => {
+      res.status(204).send();
     })
     .catch((error) => {
       next(error);
@@ -49,4 +62,5 @@ module.exports = {
   getArticleById,
   patchArticle,
   deleteArticleById,
+  postArticle,
 };

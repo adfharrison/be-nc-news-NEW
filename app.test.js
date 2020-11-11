@@ -117,6 +117,81 @@ describe('/api', () => {
           expect(response.body).toMatchObject({ articles: expect.any(Array) });
         });
     });
+    test('GET status 200 - return articles sorted by date by default', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toBeSortedBy('created_at', {
+            descending: true,
+          });
+        });
+    });
+    test('200 returns articles sorted by...', () => {
+      const validQueries = [
+        'article_id',
+        'title',
+        'votes',
+        'topic',
+        'author',
+        'created_at',
+      ];
+      const requestPromises = validQueries.map((validQuery) => {
+        return request(app)
+          .get(`/api/articles?sort_by=${validQuery}`)
+          .expect(200)
+          .then((response) => {
+            expect(response.body.articles).toBeSortedBy(validQuery, {
+              descending: true,
+            });
+          });
+      });
+      return Promise.all(requestPromises);
+    });
+    test('GET status 200 - can order by ascending ', () => {
+      return request(app)
+        .get('/api/articles?order=asc')
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toBeSortedBy('created_at', {
+            descending: false,
+          });
+        });
+    });
+    test('GET status 200 - can order by column + ascending ', () => {
+      return request(app)
+        .get('/api/articles?sort_by=author&order=asc')
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toBeSortedBy('author', {
+            descending: false,
+          });
+        });
+    });
+    test('POST status 201 can post new article', () => {
+      return request(app)
+        .post('/api/articles')
+        .send({
+          title: 'this is a new article',
+          body: 'the article that is new, is new',
+          votes: 12,
+          topic: 'mitch',
+          author: 'butter_bridge',
+          created_at: '2018-11-15T12:21:54.171Z',
+        })
+        .expect(201)
+        .then((response) => {
+          expect(response.body).toEqual({
+            article_id: 13,
+            title: 'this is a new article',
+            body: 'the article that is new, is new',
+            votes: 12,
+            topic: 'mitch',
+            author: 'butter_bridge',
+            created_at: '2018-11-15T12:21:54.171Z',
+          });
+        });
+    });
 
     describe('api/articles/:article_id', () => {
       test('GET status 200 and single article', () => {
@@ -219,17 +294,14 @@ describe('/api', () => {
             });
           });
       });
-      // ********* HERE IS WHERE I WAS UP TO, NEXT IS QUERIES ON GET ARTICLES - FIX MODEL
-      test('DELETE status 204 returns "articles deleted: 1" ', () => {
+
+      test('DELETE status 204', () => {
         return request(app)
           .delete('/api/articles/1')
           .expect(204)
-          .then((res) => {
-            expect(res.body).toBe({ msg: 'Comments deleted: 1' });
-          })
           .then(() => {
             return request(app)
-              .get(api / articles)
+              .get('/api/articles')
               .then((res) => {
                 expect(res.body.articles.length).toBe(11);
               });
@@ -361,9 +433,52 @@ describe('/api', () => {
             expect(body.msg).toBe('Bad Request');
           });
       });
+      test('DELETE 404 invalid article_id /articles/:article_id ', () => {
+        return request(app)
+          .delete('/api/articles/99999')
+
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Article Not Found');
+          });
+      });
+      test('DELETE 400 bad request /articles/:article_id ', () => {
+        return request(app)
+          .delete('/api/articles/chips')
+
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad Request');
+          });
+      });
+      test('POST 400 bad request /articles - incorrect post format ', () => {
+        return request(app)
+          .post('/api/articles')
+          .send({
+            notAKey: 'this is a new article',
+            notAKeyEither: 'the article that is new, is new',
+            votes: 12,
+            topic: 'mitch',
+            author: 'butter_bridge',
+            created_at: '2018-11-15T12:21:54.171Z',
+          })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad Request');
+          });
+      });
       test(' Query 400 Error - /articles/:article_id/comments - SortBy', () => {
         return request(app)
           .get('/api/articles/1/comments?sort_by=notAcolumn')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad Request');
+          });
+      });
+
+      test(' Query 400 Error - /articles/- SortBy', () => {
+        return request(app)
+          .get('/api/articles/?sort_by=notAcolumn')
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).toBe('Bad Request');

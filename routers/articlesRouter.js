@@ -5,12 +5,13 @@ const {
   getArticleById,
   patchArticle,
   deleteArticleById,
+  postArticle,
 } = require('../contollers/articlesCTRL.js');
 
 const { getCommentsByArticleId } = require('../contollers/commentsCTRL');
 const { send405 } = require('../errors');
 
-articlesRouter.route('/').get(getAllArticles).all(send405);
+articlesRouter.route('/').get(getAllArticles).post(postArticle).all(send405);
 articlesRouter
   .route('/:article_id')
   .get(getArticleById)
