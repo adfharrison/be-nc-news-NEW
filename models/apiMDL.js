@@ -41,8 +41,9 @@ const fetchAllEndpoints = (req) => {
                   option5: 'author',
                 },
                 'order (/articles?order=option OR articles?sort_by=option&order=option)': {
-                  default: 'asc',
-                  option1: 'desc',
+                  'default for created_at and votes': 'desc',
+                  'otherwise default': 'asc',
+                  options: 'desc + asc',
                 },
                 'limit (articles?limit=integer, plus any other valid query)': {
                   default: 10,
@@ -89,8 +90,9 @@ const fetchAllEndpoints = (req) => {
                     option5: 'author',
                   },
                   'order (/articles/integer/comments?order=option OR articles?sort_by=option&order=option)': {
-                    default: 'asc',
-                    option1: 'desc',
+                    'default for created_at and votes': 'desc',
+                    'otherwise default': 'asc',
+                    options: 'desc + asc',
                   },
                 },
               },

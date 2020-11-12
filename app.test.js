@@ -179,21 +179,14 @@ describe('/api', () => {
         });
     });
     test('GET 200 returns articles sorted by...', () => {
-      const validQueries = [
-        'article_id',
-        'title',
-        'votes',
-        'topic',
-        'author',
-        'created_at',
-      ];
+      const validQueries = ['article_id', 'title', 'topic', 'author'];
       const requestPromises = validQueries.map((validQuery) => {
         return request(app)
           .get(`/api/articles?sort_by=${validQuery}`)
           .expect(200)
           .then((response) => {
             expect(response.body.articles).toBeSortedBy(validQuery, {
-              descending: true,
+              descending: false,
             });
           });
       });

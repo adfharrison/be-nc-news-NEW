@@ -9,11 +9,16 @@ const fetchAllArticles = (
 ) => {
   id = req.params.article_id;
   offset = (page - 1) * limit;
+
+  let newOrder = order;
+  if (sort_by !== 'created_at' && sort_by !== 'votes') {
+    newOrder = 'asc';
+  }
   return connection
     .select('*')
     .from('articles')
     .limit(limit)
-    .orderBy(sort_by, order)
+    .orderBy(sort_by, newOrder)
     .offset(offset)
     .then((articlesRows) => {
       return { articles: articlesRows };

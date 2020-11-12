@@ -18,11 +18,16 @@ const fetchCommentsByArticleId = (
 ) => {
   id = req.params.article_id;
 
+  let newOrder = order;
+  if (sort_by !== 'created_at' && sort_by !== 'votes') {
+    newOrder = 'asc';
+  }
+
   return connection
     .select('*')
     .from('comments')
     .where('article_id', '=', id)
-    .orderBy(sort_by, order)
+    .orderBy(sort_by, newOrder)
     .then((comments) => {
       if (comments.length === 0) {
         return Promise.reject({ status: 404, msg: 'Comments Not Found' });
