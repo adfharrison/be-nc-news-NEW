@@ -21,7 +21,9 @@ const getAllComments = (req, res, next) => {
 const getCommentsByArticleId = (req, res, next) => {
   const sort_by = req.query.sort_by;
   const order = req.query.order;
-  fetchCommentsByArticleId(req, sort_by, order)
+  const limit = req.query.limit;
+  const page = req.query.p;
+  fetchCommentsByArticleId(req, sort_by, order, limit, page)
     .then((comments) => {
       res.status(200).send(comments);
     })

@@ -14,30 +14,40 @@ const fetchAllComments = (req, sort_by = 'created_at', order = 'desc') => {
 const fetchCommentsByArticleId = (
   req,
   sort_by = 'created_at',
-  order = 'desc'
+  order = 'desc',
+  limit = 10,
+  page = 1
 ) => {
   id = req.params.article_id;
+  offset = (page - 1) * limit;
 
   let newOrder = order;
   if (sort_by !== 'created_at' && sort_by !== 'votes') {
     newOrder = 'asc';
   }
 
-  return connection
-    .select('*')
-    .from('comments')
-    .where('article_id', '=', id)
-    .orderBy(sort_by, newOrder)
-    .then((comments) => {
-      if (comments.length === 0) {
-        return Promise.reject({ status: 404, msg: 'Comments Not Found' });
-      } else {
-        comments.forEach((comment) => {
-          delete comment.article_id;
-        });
-        return { comments: comments };
-      }
-    });
+  return Promise.all([
+    connection
+      .select('*')
+      .from('comments')
+      .where('article_id', '=', id)
+      .limit(limit)
+      .orderBy(sort_by, newOrder)
+      .offset(offset),
+    connection.select('*').from('comments').where('article_id', '=', id),
+  ]).then((promises) => {
+    comments = promises[0];
+    totalComments = promises[1].length;
+
+    if (comments.length === 0) {
+      return Promise.reject({ status: 404, msg: 'Comments Not Found' });
+    } else {
+      comments.forEach((comment) => {
+        delete comment.article_id;
+      });
+      return { comments: comments, total_count: totalComments };
+    }
+  });
 };
 
 const fetchCommentById = (req) => {

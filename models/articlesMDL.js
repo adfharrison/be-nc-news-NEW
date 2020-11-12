@@ -1,4 +1,5 @@
 const connection = require('../db/data/connections');
+const articlesRouter = require('../routers/articlesRouter');
 
 const fetchAllArticles = (
   req,
@@ -14,15 +15,21 @@ const fetchAllArticles = (
   if (sort_by !== 'created_at' && sort_by !== 'votes') {
     newOrder = 'asc';
   }
-  return connection
-    .select('*')
-    .from('articles')
-    .limit(limit)
-    .orderBy(sort_by, newOrder)
-    .offset(offset)
-    .then((articlesRows) => {
-      return { articles: articlesRows };
-    });
+
+  return Promise.all([
+    connection
+      .select('*')
+      .from('articles')
+      .limit(limit)
+      .orderBy(sort_by, newOrder)
+      .offset(offset),
+    connection.select('*').from('articles'),
+  ]).then((promises) => {
+    articlesRows = promises[0];
+    totalArticles = promises[1].length;
+
+    return { articles: articlesRows, total_count: totalArticles };
+  });
 };
 
 const sendArticle = (req) => {

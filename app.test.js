@@ -160,12 +160,15 @@ describe('/api', () => {
     });
   });
   describe('api/articles', () => {
-    test('GET status 200 and array of articles', () => {
+    test('GET status 200 and array of articles, with total count', () => {
       return request(app)
         .get('/api/articles')
         .expect(200)
         .then((response) => {
-          expect(response.body).toMatchObject({ articles: expect.any(Array) });
+          expect(response.body).toMatchObject({
+            articles: expect.any(Array),
+            total_count: 12,
+          });
         });
     });
     test('GET status 200 - return articles sorted by date by default', () => {
@@ -212,20 +215,22 @@ describe('/api', () => {
           });
         });
     });
-    test('GET status 200 -article limit defaults to 10', () => {
+    test('GET status 200 -article limit defaults to 10, retains total_count', () => {
       return request(app)
         .get('/api/articles?limit=10')
         .expect(200)
         .then((response) => {
           expect(response.body.articles.length).toBe(10);
+          expect(response.body.total_count).toBe(12);
         });
     });
-    test('GET status 200 - can set article limit', () => {
+    test('GET status 200 - can set article limit, retains total_count', () => {
       return request(app)
         .get('/api/articles?limit=5')
         .expect(200)
         .then((response) => {
           expect(response.body.articles.length).toBe(5);
+          expect(response.body.total_count).toBe(12);
         });
     });
 
@@ -507,6 +512,83 @@ describe('/api', () => {
             expect(response.body).toHaveProperty('comment_id');
             expect(response.body).toHaveProperty('created_at');
             expect(response.body).toHaveProperty('author');
+          });
+      });
+      test('GET status 200 -comment limit defaults to 10, retains total_count', () => {
+        return request(app)
+          .get('/api/articles/1/comments?limit=10')
+          .expect(200)
+          .then((response) => {
+            expect(response.body.comments.length).toBe(10);
+            expect(response.body.total_count).toBe(13);
+          });
+      });
+      test('GET status 200 - can set comment limit, retains total_count', () => {
+        return request(app)
+          .get('/api/articles/1/comments?limit=5')
+          .expect(200)
+          .then((response) => {
+            expect(response.body.comments.length).toBe(5);
+            expect(response.body.total_count).toBe(13);
+          });
+      });
+      test('GET status 200 - can set pages based on limit', () => {
+        return request(app)
+          .get('/api/articles/1/comments?limit=2&p=2')
+          .expect(200)
+          .then((response) => {
+            expect(response.body.comments).toEqual([
+              {
+                comment_id: 4,
+                author: 'icellusedkars',
+                body:
+                  ' I carry a log — yes. Is it funny to you? It is not to me.',
+                created_at: '2014-11-23T12:36:03.389Z',
+
+                votes: -100,
+              },
+              {
+                comment_id: 5,
+                author: 'icellusedkars',
+                body: 'I hate streaming noses',
+                created_at: '2013-11-23T12:36:03.389Z',
+
+                votes: 0,
+              },
+            ]);
+          });
+      });
+      test('GET status 200 - can set pages without user defined limit', () => {
+        return request(app)
+          .get('/api/articles/1/comments?p=2')
+          .expect(200)
+          .then((response) => {
+            expect(response.body.comments).toEqual([
+              {
+                comment_id: 12,
+                author: 'icellusedkars',
+                body: 'Massive intercranial brain haemorrhage',
+                created_at: '2006-11-25T12:36:03.389Z',
+
+                votes: 0,
+              },
+              {
+                comment_id: 13,
+                author: 'icellusedkars',
+                body: 'Fruit pastilles',
+                created_at: '2005-11-25T12:36:03.389Z',
+
+                votes: 0,
+              },
+              {
+                comment_id: 18,
+                author: 'butter_bridge',
+                body: 'This morning, I showered for nine minutes.',
+                created_at: '2000-11-26T12:36:03.389Z',
+
+                votes: 16,
+              },
+            ]);
           });
       });
     });

@@ -94,6 +94,14 @@ const fetchAllEndpoints = (req) => {
                     'otherwise default': 'asc',
                     options: 'desc + asc',
                   },
+                  'limit (articles?limit=integer, plus any other valid query)': {
+                    default: 10,
+                    options: 'any positive integer',
+                  },
+                  'start page (articles?limit=integer, plus any other valid query)': {
+                    default: 10,
+                    options: 'any positive integer',
+                  },
                 },
               },
               POST: {
