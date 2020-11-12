@@ -46,7 +46,16 @@ const fetchAllEndpoints = (req) => {
                 },
               },
             },
-            POST: 'post a new article',
+            POST: {
+              does: 'post a new article',
+              requestBody: {
+                title: 'this is a new article',
+                body: 'the article that is new, is new',
+
+                topic: 'mitch',
+                author: 'butter_bridge',
+              },
+            },
           },
           '/:article_id': {
             methods: {
