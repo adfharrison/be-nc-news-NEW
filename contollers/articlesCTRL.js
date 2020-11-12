@@ -9,7 +9,9 @@ const {
 const getAllArticles = (req, res, next) => {
   const sort_by = req.query.sort_by;
   const order = req.query.order;
-  fetchAllArticles(req, sort_by, order)
+  const limit = req.query.limit;
+  const page = req.query.p;
+  fetchAllArticles(req, sort_by, order, limit, page)
     .then((articles) => {
       res.status(200).send(articles);
     })

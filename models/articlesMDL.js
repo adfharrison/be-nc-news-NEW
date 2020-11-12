@@ -1,11 +1,20 @@
 const connection = require('../db/data/connections');
 
-const fetchAllArticles = (req, sort_by = 'created_at', order = 'desc') => {
+const fetchAllArticles = (
+  req,
+  sort_by = 'created_at',
+  order = 'desc',
+  limit = 10,
+  page = 1
+) => {
   id = req.params.article_id;
+  offset = (page - 1) * limit;
   return connection
     .select('*')
     .from('articles')
+    .limit(limit)
     .orderBy(sort_by, order)
+    .offset(offset)
     .then((articlesRows) => {
       return { articles: articlesRows };
     });

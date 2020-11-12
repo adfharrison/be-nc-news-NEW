@@ -219,6 +219,79 @@ describe('/api', () => {
           });
         });
     });
+    test('GET status 200 -article limit defaults to 10', () => {
+      return request(app)
+        .get('/api/articles?limit=10')
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length).toBe(10);
+        });
+    });
+    test('GET status 200 - can set article limit', () => {
+      return request(app)
+        .get('/api/articles?limit=5')
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles.length).toBe(5);
+        });
+    });
+
+    test('GET status 200 - can set pages based on limit', () => {
+      return request(app)
+        .get('/api/articles?limit=2&p=2')
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toEqual([
+            {
+              article_id: 3,
+              author: 'icellusedkars',
+              body: 'some gifs',
+              created_at: '2010-11-17T12:21:54.171Z',
+              title: 'Eight pug gifs that remind me of mitch',
+              topic: 'mitch',
+              votes: 0,
+            },
+            {
+              article_id: 4,
+              author: 'rogersop',
+              body:
+                'We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages',
+              created_at: '2006-11-18T12:21:54.171Z',
+              title: 'Student SUES Mitch!',
+              topic: 'mitch',
+              votes: 0,
+            },
+          ]);
+        });
+    });
+    test('GET status 200 - can set pages without user defined limit', () => {
+      return request(app)
+        .get('/api/articles?p=2')
+        .expect(200)
+        .then((response) => {
+          expect(response.body.articles).toEqual([
+            {
+              article_id: 11,
+              author: 'icellusedkars',
+              body:
+                'Having run out of ideas for articles, I am staring at the wall blankly, like a cat. Does this make me a cat?',
+              created_at: '1978-11-25T12:21:54.171Z',
+              title: 'Am I a cat?',
+              topic: 'mitch',
+              votes: 0,
+            },
+            {
+              article_id: 12,
+              author: 'butter_bridge',
+              body: 'Have you seen the size of that thing?',
+              created_at: '1974-11-26T12:21:54.171Z',
+              title: 'Moustache',
+              topic: 'mitch',
+              votes: 0,
+            },
+          ]);
+        });
+    });
     test('POST status 201 can post new article', () => {
       return request(app)
         .post('/api/articles')
@@ -352,7 +425,7 @@ describe('/api', () => {
           .expect(204)
           .then(() => {
             return request(app)
-              .get('/api/articles')
+              .get('/api/articles?limit=12')
               .then((res) => {
                 expect(res.body.articles.length).toBe(11);
               });
@@ -456,6 +529,14 @@ describe('/api', () => {
             });
         });
         return Promise.all(requestPromises);
+      });
+      test('400 bad request /articles?limit negative number', () => {
+        return request(app)
+          .get('/api/articles?limit=-2')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad Request');
+          });
       });
       test('GET 404 invalid article_id /articles/:article_id ', () => {
         return request(app)
