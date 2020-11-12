@@ -8,7 +8,7 @@ const send405 = (req, res, next) => {
 
 const handlePSQLErrors = (err, req, res, next) => {
   console.log(err.code, '<<<<<err code');
-  const badReqCodes = ['22P02', '42703', '23502'];
+  const badReqCodes = ['22P02', '42703', '23502', '23503'];
   if (badReqCodes.includes(err.code)) {
     res.status(400).send({ msg: 'Bad Request' });
   } else {

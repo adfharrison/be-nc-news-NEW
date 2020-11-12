@@ -52,8 +52,8 @@ const fetchAllEndpoints = (req) => {
                 title: 'this is a new article',
                 body: 'the article that is new, is new',
 
-                topic: 'mitch',
-                author: 'butter_bridge',
+                topic: 'a valid topic',
+                author: 'a valid author',
               },
             },
           },
