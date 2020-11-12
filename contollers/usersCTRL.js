@@ -1,4 +1,8 @@
-const { fetchAllUsers, fetchUserByUsername } = require('../models/usersMDL');
+const {
+  sendNewUser,
+  fetchAllUsers,
+  fetchUserByUsername,
+} = require('../models/usersMDL');
 
 const getAllUsers = (req, res, next) => {
   fetchAllUsers(req)
@@ -19,5 +23,14 @@ const getUserByUsername = (req, res, next) => {
       next(error);
     });
 };
+const postNewUser = (req, res, next) => {
+  sendNewUser(req)
+    .then((newUser) => {
+      res.status(201).send(newUser);
+    })
+    .catch((error) => {
+      next(error);
+    });
+};
 
-module.exports = { getAllUsers, getUserByUsername };
+module.exports = { getAllUsers, getUserByUsername, postNewUser };

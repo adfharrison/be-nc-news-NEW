@@ -23,4 +23,15 @@ const fetchUserByUsername = (req) => {
       }
     });
 };
-module.exports = { fetchAllUsers, fetchUserByUsername };
+
+const sendNewUser = (req) => {
+  newUser = req.body.newUser;
+  return connection
+    .insert(newUser, ['*'])
+    .into('users')
+    .then((postedUser) => {
+      user = { newUser: postedUser[0] };
+      return user;
+    });
+};
+module.exports = { fetchAllUsers, fetchUserByUsername, sendNewUser };

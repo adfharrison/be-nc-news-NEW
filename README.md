@@ -118,12 +118,12 @@ POST /api/articles done
 PATCH /api/comments/:comment_id done
 DELETE /api/comments/:comment_id done
 
-GET /api
+GET /api done
 
 
 POST /api/topics
 POST /api/users
-GET /api/users
+GET /api/users done
 ```
 
 ---

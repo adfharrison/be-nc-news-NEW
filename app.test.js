@@ -4,6 +4,7 @@ const app = require('./app');
 const request = require('supertest');
 const connection = require('./db/data/connections');
 const { convertTimeStamp } = require('./db/utils/data-manipulation');
+const { get } = require('./routers/apiRouter');
 
 describe('/api', () => {
   afterAll(() => {
@@ -16,6 +17,15 @@ describe('/api', () => {
   //beforeEach(() => {
   // Date.now = jest.fn(() => 1605052800000); // 2020-11-11T00:00Z0 (GMT)
   //});
+
+  test('/api returns a json of all endpoints', () => {
+    return request(app)
+      .get('/api')
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual({ endpoints: expect.any(Object) });
+      });
+  });
   describe('/api - errors', () => {
     test('404 missing api/ endpoint', () => {
       return request(app)
@@ -60,6 +70,28 @@ describe('/api', () => {
           expect(response.body).toMatchObject({ users: expect.any(Array) });
         });
     });
+
+    test('POST status 201 can post a new user', () => {
+      return request(app)
+        .post('/api/users')
+        .send({
+          newUser: {
+            username: 'new_user',
+            name: 'this is their name',
+            avatar_url: 'https://avatar_url.com',
+          },
+        })
+        .expect(201)
+        .then((response) => {
+          expect(response.body).toEqual({
+            newUser: {
+              username: 'new_user',
+              name: 'this is their name',
+              avatar_url: 'https://avatar_url.com',
+            },
+          });
+        });
+    });
     describe('api/users/:username', () => {
       test('GET status 200 and single user', () => {
         return request(app)
@@ -80,7 +112,7 @@ describe('/api', () => {
 
     describe('api/users - errors ', () => {
       test('405 invalid methods /users method', () => {
-        const invalidMethods = ['patch', 'put', 'delete'];
+        const invalidMethods = ['put', 'delete'];
         const requestPromises = invalidMethods.map((method) => {
           return request(app)
             [method]('/api/users')
@@ -102,6 +134,20 @@ describe('/api', () => {
             });
         });
         return Promise.all(requestPromises);
+      });
+      test(' 400 bad POST request Error - incorrect req.body', () => {
+        return request(app)
+          .post('/api/users')
+          .send({
+            newUser: {
+              username: 'new_user',
+            },
+          })
+
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad Request');
+          });
       });
       test('404 invalid username /users/:username ', () => {
         return request(app)
@@ -132,7 +178,7 @@ describe('/api', () => {
           });
         });
     });
-    test('200 returns articles sorted by...', () => {
+    test('GET 200 returns articles sorted by...', () => {
       const validQueries = [
         'article_id',
         'title',
