@@ -710,7 +710,7 @@ describe('/api', () => {
 
       test('GET 404 invalid article_id /articles/:article_id/comments ', () => {
         return request(app)
-          .delete('/api/articles/99999/comments')
+          .get('/api/articles/99999/comments')
 
           .expect(404)
           .then(({ body }) => {
