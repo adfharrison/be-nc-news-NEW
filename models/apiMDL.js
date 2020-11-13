@@ -15,11 +15,30 @@ const fetchAllEndpoints = (req) => {
         '/topics': {
           methods: {
             GET: 'get all topics',
+            POST: {
+              does: 'post a new topic',
+              requestBody: {
+                newTopic: {
+                  description: 'this is a new topic',
+                  slug: 'the topic that is new, is new',
+                },
+              },
+            },
           },
         },
         '/users': {
           methods: {
             GET: 'get all users',
+            POST: {
+              does: 'post a new user',
+              requestBody: {
+                newUser: {
+                  username: 'this is a new user',
+                  name: 'the user that is new, is new',
+                  avatar_url: 'picture of avatar',
+                },
+              },
+            },
           },
           '/:username': {
             methods: {
@@ -58,11 +77,13 @@ const fetchAllEndpoints = (req) => {
             POST: {
               does: 'post a new article',
               requestBody: {
-                title: 'this is a new article',
-                body: 'the article that is new, is new',
+                newArticle: {
+                  title: 'this is a new article',
+                  body: 'the article that is new, is new',
 
-                topic: 'a valid topic',
-                author: 'a valid author',
+                  topic: 'a valid topic',
+                  author: 'a valid author',
+                },
               },
             },
           },
@@ -108,8 +129,10 @@ const fetchAllEndpoints = (req) => {
                 does:
                   'add comment to article by id (/articles/integer/comments)',
                 requestBody: {
-                  username: 'username',
-                  body: 'comment body',
+                  newComment: {
+                    username: 'username',
+                    body: 'comment body',
+                  },
                 },
               },
             },

@@ -87,7 +87,7 @@ const fetchCommentById = (req) => {
 };
 
 const sendComment = (req) => {
-  comment = req.body;
+  comment = req.body.newComment;
   id = req.params.article_id;
 
   comment.author = comment.username;
@@ -100,7 +100,7 @@ const sendComment = (req) => {
     .join()
 
     .then((postedComment) => {
-      return postedComment[0];
+      return { newComment: postedComment[0] };
     });
 };
 

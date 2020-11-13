@@ -46,6 +46,26 @@ describe('/api', () => {
           expect(response.body).toMatchObject({ topics: expect.any(Array) });
         });
     });
+
+    test('POST status 201 and can create new topic. returns new topic', () => {
+      return request(app)
+        .post('/api/topics')
+        .send({
+          newTopic: {
+            description: 'This is a new topic',
+            slug: 'new',
+          },
+        })
+        .expect(201)
+        .then((response) => {
+          expect(response.body).toEqual({
+            newTopic: {
+              description: 'This is a new topic',
+              slug: 'new',
+            },
+          });
+        });
+    });
     describe('api/topics - errors ', () => {
       test('405 invalid methods topics method', () => {
         const invalidMethods = ['patch', 'put', 'delete'];
@@ -59,6 +79,20 @@ describe('/api', () => {
         });
         return Promise.all(requestPromises);
       });
+    });
+    test(' 400 bad POST request Error - incorrect req.body', () => {
+      return request(app)
+        .post('/api/topics')
+        .send({
+          newTopic: {
+            description: 'new_user',
+          },
+        })
+
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Bad Request');
+        });
     });
   });
   describe('api/users', () => {
@@ -294,16 +328,18 @@ describe('/api', () => {
       return request(app)
         .post('/api/articles')
         .send({
-          title: 'this is a new article',
-          body: 'the article that is new, is new',
-          votes: 12,
-          topic: 'mitch',
-          author: 'butter_bridge',
-          created_at: '2018-11-15T12:21:54.171Z',
+          newArticle: {
+            title: 'this is a new article',
+            body: 'the article that is new, is new',
+            votes: 12,
+            topic: 'mitch',
+            author: 'butter_bridge',
+            created_at: '2018-11-15T12:21:54.171Z',
+          },
         })
         .expect(201)
         .then((response) => {
-          expect(response.body).toEqual({
+          expect(response.body.newArticle).toEqual({
             article_id: 13,
             title: 'this is a new article',
             body: 'the article that is new, is new',
@@ -512,19 +548,21 @@ describe('/api', () => {
         return request(app)
           .post('/api/articles/1/comments')
           .send({
-            username: 'butter_bridge',
-            body: 'i am a new comment body',
+            newComment: {
+              username: 'butter_bridge',
+              body: 'i am a new comment body',
+            },
           })
           .expect(201)
           .then((response) => {
             //const timeNow = convertTimeStamp(Date.now());
 
-            expect(response.body).toHaveProperty('article_id');
-            expect(response.body).toHaveProperty('body');
-            expect(response.body).toHaveProperty('votes');
-            expect(response.body).toHaveProperty('comment_id');
-            expect(response.body).toHaveProperty('created_at');
-            expect(response.body).toHaveProperty('author');
+            expect(response.body.newComment).toHaveProperty('article_id');
+            expect(response.body.newComment).toHaveProperty('body');
+            expect(response.body.newComment).toHaveProperty('votes');
+            expect(response.body.newComment).toHaveProperty('comment_id');
+            expect(response.body.newComment).toHaveProperty('created_at');
+            expect(response.body.newComment).toHaveProperty('author');
           });
       });
       test('GET status 200 -comment limit defaults to 10, retains total_count', () => {
@@ -694,12 +732,14 @@ describe('/api', () => {
         return request(app)
           .post('/api/articles')
           .send({
-            notAKey: 'this is a new article',
-            notAKeyEither: 'the article that is new, is new',
-            votes: 12,
-            topic: 'mitch',
-            author: 'butter_bridge',
-            created_at: '2018-11-15T12:21:54.171Z',
+            newArticle: {
+              notAKey: 'this is a new article',
+              notAKeyEither: 'the article that is new, is new',
+              votes: 12,
+              topic: 'mitch',
+              author: 'butter_bridge',
+              created_at: '2018-11-15T12:21:54.171Z',
+            },
           })
           .expect(400)
           .then(({ body }) => {
@@ -721,12 +761,14 @@ describe('/api', () => {
         return request(app)
           .post('/api/articles/1/comments')
           .send({
-            notAKey: 'this is a new article',
-            notAKeyEither: 'the article that is new, is new',
-            votes: 12,
-            topic: 'mitch',
-            author: 'butter_bridge',
-            created_at: '2018-11-15T12:21:54.171Z',
+            newComment: {
+              notAKey: 'this is a new article',
+              notAKeyEither: 'the article that is new, is new',
+              votes: 12,
+              topic: 'mitch',
+              author: 'butter_bridge',
+              created_at: '2018-11-15T12:21:54.171Z',
+            },
           })
           .expect(400)
           .then(({ body }) => {

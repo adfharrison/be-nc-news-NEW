@@ -9,4 +9,14 @@ const fetchAllTopics = () => {
     });
 };
 
-module.exports = { fetchAllTopics };
+const sendNewTopic = (req) => {
+  topic = req.body.newTopic;
+  return connection
+    .insert(topic, ['*'])
+    .into('topics')
+    .then((postedTopic) => {
+      return { newTopic: postedTopic[0] };
+    });
+};
+
+module.exports = { fetchAllTopics, sendNewTopic };

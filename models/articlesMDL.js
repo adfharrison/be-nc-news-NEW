@@ -33,12 +33,12 @@ const fetchAllArticles = (
 };
 
 const sendArticle = (req) => {
-  article = req.body;
+  article = req.body.newArticle;
   return connection
     .insert(article, ['*'])
     .into('articles')
     .then((postedArticle) => {
-      return postedArticle[0];
+      return { newArticle: postedArticle[0] };
     });
 };
 

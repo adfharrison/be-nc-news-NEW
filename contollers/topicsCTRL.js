@@ -1,4 +1,4 @@
-const { fetchAllTopics } = require('../models/topicsMDL');
+const { fetchAllTopics, sendNewTopic } = require('../models/topicsMDL');
 
 const getAllTopics = (req, res, next) => {
   fetchAllTopics(req)
@@ -10,4 +10,14 @@ const getAllTopics = (req, res, next) => {
     });
 };
 
-module.exports = { getAllTopics };
+const postNewTopic = (req, res, next) => {
+  sendNewTopic(req)
+    .then((topic) => {
+      res.status(201).send(topic);
+    })
+    .catch((error) => {
+      next(error);
+    });
+};
+
+module.exports = { getAllTopics, postNewTopic };
