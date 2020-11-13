@@ -49,7 +49,7 @@ const fetchAllEndpoints = (req) => {
                   default: 10,
                   options: 'any positive integer',
                 },
-                'start page (articles?limit=integer, plus any other valid query)': {
+                'start page (articles?p=integer, plus any other valid query)': {
                   default: 1,
                   options: 'any positive integer',
                 },
@@ -98,7 +98,7 @@ const fetchAllEndpoints = (req) => {
                     default: 10,
                     options: 'any positive integer',
                   },
-                  'start page (articles?limit=integer, plus any other valid query)': {
+                  'start page (articles?p=integer, plus any other valid query)': {
                     default: 1,
                     options: 'any positive integer',
                   },
