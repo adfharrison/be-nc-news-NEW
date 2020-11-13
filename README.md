@@ -122,7 +122,7 @@ GET /api done
 
 
 POST /api/topics
-POST /api/users
+POST /api/users done
 GET /api/users done
 ```
 
@@ -364,8 +364,8 @@ Should accept the following queries:
 #### More Routes
 
 ```http
-DELETE /api/articles/:article_id
-POST /api/topics
-POST /api/users
-GET /api/users
+DELETE /api/articles/:article_id done
+POST /api/topics done
+POST /api/users done
+GET /api/users done
 ```

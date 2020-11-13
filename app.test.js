@@ -79,20 +79,20 @@ describe('/api', () => {
         });
         return Promise.all(requestPromises);
       });
-    });
-    test(' 400 bad POST request Error - incorrect req.body', () => {
-      return request(app)
-        .post('/api/topics')
-        .send({
-          newTopic: {
-            description: 'new_user',
-          },
-        })
+      test(' 400 bad POST request Error - incorrect req.body', () => {
+        return request(app)
+          .post('/api/topics')
+          .send({
+            newTopic: {
+              description: 'new_user',
+            },
+          })
 
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe('Bad Request');
-        });
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Bad Request');
+          });
+      });
     });
   });
   describe('api/users', () => {
