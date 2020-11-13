@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "setup-dbs": "psql -f ./db/setup.sql",
-    "dev": "nodemon listen.js",
+    "nodemon": "nodemon listen.js",
     "seed-test": "psql -f db/setup.sql && TZ=UTC NODE_ENV=test knex seed:run",
     "seed-dev": "psql -f db/setup.sql && knex seed:run",
     "test": "jest data-manipulation.test.js",
