@@ -708,6 +708,15 @@ describe('/api', () => {
       });
       test;
 
+      test('GET 404 invalid article_id /articles/:article_id/comments ', () => {
+        return request(app)
+          .delete('/api/articles/99999/comments')
+
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Article Not Found');
+          });
+      });
       test('POST 400 bad request /articles/article_id/comments - incorrect post format ', () => {
         return request(app)
           .post('/api/articles/1/comments')
