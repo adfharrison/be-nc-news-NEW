@@ -10,6 +10,19 @@ const fetchAllComments = (req, sort_by = 'created_at', order = 'desc') => {
       return { comments: commentsRows };
     });
 };
+const checkArticlesExist = (id) => {
+  return connection
+    .select('*')
+    .from('articles')
+    .where('article_id', '=', id)
+    .then((articles) => {
+      if (articles.length === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+};
 
 const fetchCommentsByArticleId = (
   req,
@@ -35,12 +48,19 @@ const fetchCommentsByArticleId = (
       .orderBy(sort_by, newOrder)
       .offset(offset),
     connection.select('*').from('comments').where('article_id', '=', id),
+    checkArticlesExist(id),
   ]).then((promises) => {
     comments = promises[0];
     totalComments = promises[1].length;
+    articleExists = promises[2];
 
-    if (comments.length === 0) {
-      return Promise.reject({ status: 404, msg: 'Comments Not Found' });
+    if (!articleExists) {
+      return Promise.reject({ status: 404, msg: 'Article Not Found' });
+    } else if (comments.length === 0) {
+      return {
+        comments: comments,
+        total_count: 'No comments for this article',
+      };
     } else {
       comments.forEach((comment) => {
         delete comment.article_id;

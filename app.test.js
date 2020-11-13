@@ -465,6 +465,19 @@ describe('/api', () => {
             });
           });
       });
+
+      test('GET status 200 - if article exists but has no comments, still returns  but empty', () => {
+        return request(app)
+          .get('/api/articles/7/comments')
+          .expect(200)
+          .then((response) => {
+            console.log(response.body.comments);
+            expect(response.body.comments.length).toBe(0);
+            expect(response.body.total_count).toBe(
+              'No comments for this article'
+            );
+          });
+      });
       test('GET status 200 - return comments sorted by specified query', () => {
         return request(app)
           .get('/api/articles/5/comments?sort_by=votes')
@@ -693,6 +706,7 @@ describe('/api', () => {
             expect(body.msg).toBe('Bad Request');
           });
       });
+      test;
 
       test('POST 400 bad request /articles/article_id/comments - incorrect post format ', () => {
         return request(app)
