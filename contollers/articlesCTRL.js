@@ -11,7 +11,9 @@ const getAllArticles = (req, res, next) => {
   const order = req.query.order;
   const limit = req.query.limit;
   const page = req.query.p;
-  fetchAllArticles(req, sort_by, order, limit, page)
+  const author = req.query.author;
+  const topic = req.query.topic;
+  fetchAllArticles(req, sort_by, order, limit, page, author, topic)
     .then((articles) => {
       res.status(200).send(articles);
     })
@@ -43,7 +45,7 @@ const getArticleById = (req, res, next) => {
 const patchArticle = (req, res, next) => {
   editArticle(req)
     .then((updatedArticle) => {
-      res.status(201).send(updatedArticle);
+      res.status(200).send(updatedArticle);
     })
     .catch((error) => {
       next(error);

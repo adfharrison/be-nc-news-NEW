@@ -6,7 +6,9 @@ const fetchAllArticles = (
   sort_by = 'created_at',
   order = 'desc',
   limit = 10,
-  page = 1
+  page = 1,
+  author,
+  topic
 ) => {
   id = req.params.article_id;
   offset = (page - 1) * limit;
@@ -18,8 +20,19 @@ const fetchAllArticles = (
 
   return Promise.all([
     connection
-      .select('*')
+      .select('articles.*')
+      .count('comment_id AS comment_count')
       .from('articles')
+      .modify((queryBuilder) => {
+        if (author) {
+          queryBuilder.where('articles.author', '=', author);
+        }
+        if (topic) {
+          queryBuilder.where('articles.topic', '=', topic);
+        }
+      })
+      .leftJoin('comments', 'articles.article_id', '=', 'comments.article_id')
+      .groupBy('articles.article_id')
       .limit(limit)
       .orderBy(sort_by, newOrder)
       .offset(offset),

@@ -54,7 +54,7 @@ const getCommentById = (req, res, next) => {
 const patchCommentById = (req, res, next) => {
   editComment(req)
     .then((comment) => {
-      res.status(201).send({ comment });
+      res.status(200).send({ comment });
     })
     .catch((error) => {
       next(error);

@@ -205,6 +205,20 @@ describe('/api', () => {
           });
         });
     });
+    test('GET status 200 all articles should have a comment_count key', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then((response) => {
+          const allHaveCommentCount = response.body.articles.every(
+            (article) => {
+              return article.hasOwnProperty('comment_count');
+            }
+          );
+          expect(allHaveCommentCount).toBe(true);
+        });
+    });
+
     test('GET status 200 - return articles sorted by date by default', () => {
       return request(app)
         .get('/api/articles')
@@ -278,6 +292,7 @@ describe('/api', () => {
               article_id: 3,
               author: 'icellusedkars',
               body: 'some gifs',
+              comment_count: '0',
               created_at: '2010-11-17T12:21:54.171Z',
               title: 'Eight pug gifs that remind me of mitch',
               topic: 'mitch',
@@ -286,6 +301,7 @@ describe('/api', () => {
             {
               article_id: 4,
               author: 'rogersop',
+              comment_count: '0',
               body:
                 'We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages',
               created_at: '2006-11-18T12:21:54.171Z',
@@ -305,6 +321,7 @@ describe('/api', () => {
             {
               article_id: 11,
               author: 'icellusedkars',
+              comment_count: '0',
               body:
                 'Having run out of ideas for articles, I am staring at the wall blankly, like a cat. Does this make me a cat?',
               created_at: '1978-11-25T12:21:54.171Z',
@@ -315,6 +332,7 @@ describe('/api', () => {
             {
               article_id: 12,
               author: 'butter_bridge',
+              comment_count: '0',
               body: 'Have you seen the size of that thing?',
               created_at: '1974-11-26T12:21:54.171Z',
               title: 'Moustache',
@@ -324,6 +342,18 @@ describe('/api', () => {
           ]);
         });
     });
+
+    test('GET status 200 can return articles filters by author, ', () => {
+      return request(app)
+        .get('/api/articles?author=butter_bridge')
+        .then((response) => {
+          const allBySameAuthor = response.body.articles.every((article) => {
+            return article.author === 'butter_bridge';
+          });
+          expect(allBySameAuthor).toBe(true);
+        });
+    });
+
     test('POST status 201 can post new article', () => {
       return request(app)
         .post('/api/articles')
@@ -372,11 +402,11 @@ describe('/api', () => {
           });
       });
 
-      test('PATCH status 201 increment vote return updated article', () => {
+      test('PATCH status 200 increment vote return updated article', () => {
         return request(app)
           .patch('/api/articles/1')
           .send({ inc_votes: 1 })
-          .expect(201)
+          .expect(200)
           .then((response) => {
             expect(response.body).toEqual({
               article: {
@@ -392,11 +422,11 @@ describe('/api', () => {
             });
           });
       });
-      test('PATCH status 201 decrement vote return updated article', () => {
+      test('PATCH status 200 decrement vote return updated article', () => {
         return request(app)
           .patch('/api/articles/1')
           .send({ inc_votes: -1 })
-          .expect(201)
+          .expect(200)
           .then((response) => {
             expect(response.body).toEqual({
               article: {
@@ -412,11 +442,11 @@ describe('/api', () => {
             });
           });
       });
-      test('PATCH status 201 zero input doesnt change vote count', () => {
+      test('PATCH status 200 zero input doesnt change vote count', () => {
         return request(app)
           .patch('/api/articles/1')
           .send({ inc_votes: 0 })
-          .expect(201)
+          .expect(200)
           .then((response) => {
             expect(response.body).toEqual({
               article: {
@@ -432,11 +462,11 @@ describe('/api', () => {
             });
           });
       });
-      test('PATCH status 201 undefined input doesnt change vote count', () => {
+      test('PATCH status 200 undefined input doesnt change vote count', () => {
         return request(app)
           .patch('/api/articles/1')
           .send({ inc_votes: undefined })
-          .expect(201)
+          .expect(200)
           .then((response) => {
             expect(response.body).toEqual({
               article: {
@@ -462,6 +492,19 @@ describe('/api', () => {
               .get('/api/articles?limit=12')
               .then((res) => {
                 expect(res.body.articles.length).toBe(11);
+              });
+          });
+      });
+      test('DELETE status 204 - also deletes associated comments', () => {
+        return request(app)
+          .delete('/api/articles/5')
+          .expect(204)
+          .then(() => {
+            return request(app)
+              .get('/api/articles/5/comments')
+              .expect(404)
+              .then(({ body }) => {
+                expect(body.msg).toBe('Article Not Found');
               });
           });
       });
@@ -819,11 +862,11 @@ describe('/api', () => {
             expect(response.body.comment).toHaveProperty('author');
           });
       });
-      test('PATCH status 201 increment vote return updated comment', () => {
+      test('PATCH status 200 increment vote return updated comment', () => {
         return request(app)
           .patch('/api/comments/1')
           .send({ inc_votes: 1 })
-          .expect(201)
+          .expect(200)
           .then((response) => {
             expect(response.body.comment).toEqual({
               comment_id: 1,
@@ -836,11 +879,11 @@ describe('/api', () => {
             });
           });
       });
-      test('PATCH status 201 decrement vote return updated comment', () => {
+      test('PATCH status 200 decrement vote return updated comment', () => {
         return request(app)
           .patch('/api/comments/1')
           .send({ inc_votes: -1 })
-          .expect(201)
+          .expect(200)
           .then((response) => {
             expect(response.body.comment).toEqual({
               comment_id: 1,
@@ -853,11 +896,11 @@ describe('/api', () => {
             });
           });
       });
-      test('PATCH status 201 zero vote doesnt change vote count', () => {
+      test('PATCH status 200 zero vote doesnt change vote count', () => {
         return request(app)
           .patch('/api/comments/1')
           .send({ inc_votes: 0 })
-          .expect(201)
+          .expect(200)
           .then((response) => {
             expect(response.body.comment).toEqual({
               comment_id: 1,
@@ -870,11 +913,11 @@ describe('/api', () => {
             });
           });
       });
-      test('PATCH status 201 undefined vote doesnt change vote count', () => {
+      test('PATCH status 200 undefined vote doesnt change vote count', () => {
         return request(app)
           .patch('/api/comments/1')
           .send({ inc_votes: undefined })
-          .expect(201)
+          .expect(200)
           .then((response) => {
             expect(response.body.comment).toEqual({
               comment_id: 1,
