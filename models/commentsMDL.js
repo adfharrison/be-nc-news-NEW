@@ -35,9 +35,9 @@ const fetchCommentsByArticleId = (
   offset = (page - 1) * limit;
 
   let newOrder = order;
-  if (sort_by !== 'created_at' && sort_by !== 'votes') {
-    newOrder = 'asc';
-  }
+  // if (sort_by !== 'created_at' && sort_by !== 'votes') {
+  //   newOrder = 'asc';
+  // }
 
   return Promise.all([
     connection
